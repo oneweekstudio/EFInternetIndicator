@@ -18,6 +18,8 @@ public class PhysicsAnimation: NSObject, Animator {
 
     public var placement: Placement = .center
 
+    public var panHandler = PhysicsPanHandler()
+
     public weak var delegate: AnimationDelegate?
     weak var messageView: UIView?
     weak var containerView: UIView?
@@ -30,16 +32,16 @@ public class PhysicsAnimation: NSObject, Animator {
     }
 
     public func show(context: AnimationContext, completion: @escaping AnimationCompletion) {
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustMargins), name: Notification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustMargins), name: UIDevice.orientationDidChangeNotification, object: nil)
         install(context: context)
         showAnimation(context: context, completion: completion)
     }
 
     public func hide(context: AnimationContext, completion: @escaping AnimationCompletion) {
         NotificationCenter.default.removeObserver(self)
-        if panHandler?.isOffScreen ?? false {
+        if panHandler.isOffScreen {
             context.messageView.alpha = 0
-            panHandler?.state?.stop()
+            panHandler.state?.stop()
         }
         let view = context.messageView
         self.context = context
@@ -72,11 +74,11 @@ public class PhysicsAnimation: NSObject, Animator {
         container.addSubview(view)
         switch placement {
         case .center:
-            NSLayoutConstraint(item: view, attribute: .centerY, relatedBy: .equal, toItem: container, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
+            view.centerYAnchor.constraint(equalTo: container.centerYAnchor).with(priority: UILayoutPriority(200)).isActive = true
         case .top:
-            NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: container, attribute: .top, multiplier: 1, constant: 0).isActive = true
+            view.topAnchor.constraint(equalTo: container.topAnchor).with(priority: UILayoutPriority(200)).isActive = true
         case .bottom:
-            NSLayoutConstraint(item: container, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
+            view.bottomAnchor.constraint(equalTo: container.bottomAnchor).with(priority: UILayoutPriority(200)).isActive = true
         }
         NSLayoutConstraint(item: view, attribute: .leading, relatedBy: .equal, toItem: container, attribute: .leading, multiplier: 1, constant: 0).isActive = true
         NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: container, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
@@ -114,11 +116,9 @@ public class PhysicsAnimation: NSObject, Animator {
         CATransaction.commit()
     }
 
-    var panHandler: PhysicsPanHandler?
-
     func installInteractive(context: AnimationContext) {
         guard context.interactiveHide else { return }
-        panHandler = PhysicsPanHandler(context: context, animator: self)
+        panHandler.configure(context: context, animator: self)
     }
 }
 

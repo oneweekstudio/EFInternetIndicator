@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 s.name             = 'EFInternetIndicator'
-s.version          = '0.0.6'
+s.version          = '0.6.0'
 s.summary          = 'A little Internet status indicator.'
 
 # This description is used to generate tags and improve search results.
@@ -38,7 +38,7 @@ s.ios.deployment_target = '9.0'
 
 #s.public_header_files = 'EFInternetIndicator/Classes/**/*.h'
 s.source_files = 'EFInternetIndicator/Classes/**/*.{c,h,hh,m,mm,swift}'
-s.dependency 'SwiftMessages', '~> 5.0.1'
+s.dependency 'SwiftMessages'
 # s.subspec 'Interface' do |interface|
 #    interface.dependency 'SwiftMessages', :git => 'https://github.com/SwiftKickMobile/SwiftMessages/tree/5.0.1'
 # end

@@ -17,7 +17,7 @@ public class TopBottomAnimation: NSObject, Animator {
 
     public weak var delegate: AnimationDelegate?
 
-    open let style: Style
+    public let style: Style
 
     open var springDamping: CGFloat = 0.8
 
@@ -26,6 +26,12 @@ public class TopBottomAnimation: NSObject, Animator {
     open var closePercentThreshold: CGFloat = 0.33;
 
     open var closeAbsoluteThreshold: CGFloat = 75.0;
+
+    public private(set) lazy var panGestureRecognizer: UIPanGestureRecognizer = {
+        let pan = UIPanGestureRecognizer()
+        pan.addTarget(self, action: #selector(pan(_:)))
+        return pan
+    }()
 
     weak var messageView: UIView?
     weak var containerView: UIView?
@@ -41,7 +47,7 @@ public class TopBottomAnimation: NSObject, Animator {
     }
 
     public func show(context: AnimationContext, completion: @escaping AnimationCompletion) {
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustMargins), name: Notification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustMargins), name: UIDevice.orientationDidChangeNotification, object: nil)
         install(context: context)
         showAnimation(completion: completion)
     }
@@ -86,9 +92,9 @@ public class TopBottomAnimation: NSObject, Animator {
         view.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
         switch style {
         case .top:
-            view.topAnchor.constraint(equalTo: container.topAnchor, constant: -bounceOffset).isActive = true
+            view.topAnchor.constraint(equalTo: container.topAnchor, constant: -bounceOffset).with(priority: UILayoutPriority(200)).isActive = true
         case .bottom:
-            view.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: bounceOffset).isActive = true
+            view.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: bounceOffset).with(priority: UILayoutPriority(200)).isActive = true
         }
         // Important to layout now in order to get the right safe area insets
         container.layoutIfNeeded()
@@ -102,12 +108,10 @@ public class TopBottomAnimation: NSObject, Animator {
             view.transform = CGAffineTransform(translationX: 0, y: animationDistance)
         }
         if context.interactiveHide {
-            let pan = UIPanGestureRecognizer()
-            pan.addTarget(self, action: #selector(pan(_:)))
             if let view = view as? BackgroundViewable {
-                view.backgroundView.addGestureRecognizer(pan)
+                view.backgroundView.addGestureRecognizer(panGestureRecognizer)
             } else {
-                view.addGestureRecognizer(pan)
+                view.addGestureRecognizer(panGestureRecognizer)
             }
         }
         if let view = view as? BackgroundViewable,
@@ -144,7 +148,7 @@ public class TopBottomAnimation: NSObject, Animator {
             completion(false)
             return
         }
-        let animationDistance = fabs(view.transform.ty)
+        let animationDistance = abs(view.transform.ty)
         // Cap the initial velocity at zero because the bounceOffset may not be great
         // enough to allow for greater bounce induced by a quick panning motion.
         let initialSpringVelocity = animationDistance == 0.0 ? 0.0 : min(0.0, closeSpeed / animationDistance)
@@ -184,7 +188,7 @@ public class TopBottomAnimation: NSObject, Animator {
                 velocity.y *= -1.0
                 translation.y *= -1.0
             }
-            var translationAmount = translation.y >= 0 ? translation.y : -pow(fabs(translation.y), 0.7)
+            var translationAmount = translation.y >= 0 ? translation.y : -pow(abs(translation.y), 0.7)
             if !closing {
                 // Turn on rubber banding if background view is inset from message view.
                 if let background = (messageView as? BackgroundViewable)?.backgroundView, background != view {

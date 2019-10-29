@@ -1,15 +1,15 @@
 PODS:
-  - EFInternetIndicator (0.5.0):
-    - SwiftMessages (~> 5.0.1)
-  - SwiftMessages (5.0.1):
-    - SwiftMessages/App (= 5.0.1)
-  - SwiftMessages/App (5.0.1)
+  - EFInternetIndicator (0.6.0):
+    - SwiftMessages
+  - SwiftMessages (7.0.1):
+    - SwiftMessages/App (= 7.0.1)
+  - SwiftMessages/App (7.0.1)
 
 DEPENDENCIES:
   - EFInternetIndicator (from `../`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - SwiftMessages
 
 EXTERNAL SOURCES:
@@ -17,9 +17,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  EFInternetIndicator: 923ca71b5da59b43868e7fab8d19e04ea83a6578
-  SwiftMessages: 32ce3cfc8388b41aae56ff4853cc752a20101147
+  EFInternetIndicator: 59ff1e945d5d378e63c75c65963c917be639dea3
+  SwiftMessages: b577dc7043be8b299857ab35bb663dbff6483bd0
 
 PODFILE CHECKSUM: 8e2f1e2aa1e7bcede3b95da3211a39ba70a31291
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.8.4
